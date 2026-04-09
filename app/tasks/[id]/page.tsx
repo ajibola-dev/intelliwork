@@ -218,6 +218,13 @@ export default function TaskDetailPage() {
         <ArrowLeft size={12} /> Back to marketplace
       </Link>
 
+      {/* Verdict link */}
+      <div className="mb-8 flex justify-end">
+        <Link href={`/verdict/${id}`} className="inline-flex items-center gap-1.5 font-mono text-xs text-[var(--cyan)] hover:underline">
+          View Verdict Log →
+        </Link>
+      </div>
+
       {/* Header */}
       <div className="border border-border bg-card p-6 mb-6">
         <div className="flex items-start justify-between gap-4 mb-4">
