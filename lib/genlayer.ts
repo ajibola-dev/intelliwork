@@ -26,3 +26,29 @@ export function getWriteClient(walletClient: { account: { address: `0x${string}`
     account: walletClient,
   });
 }
+
+/**
+ * Build a write client directly from window.ethereum.
+ * Use this instead of getWriteClient(walletClient) to avoid
+ * wagmi SSR hydration issues with custom chains.
+ */
+export async function getWindowWriteClient() {
+  const win = window as unknown as { ethereum?: { request: (a: { method: string; params?: unknown[] }) => Promise<unknown> } };
+  if (typeof window === "undefined" || !win.ethereum) {
+    throw new Error("MetaMask not found");
+  }
+  const accounts = await win.ethereum.request({ method: "eth_requestAccounts" }) as string[];
+  if (!accounts || accounts.length === 0) throw new Error("No accounts found");
+  
+  const { createWalletClient, custom } = await import("viem");
+  const viemWalletClient = createWalletClient({
+    account: accounts[0] as `0x${string}`,
+    transport: custom(win.ethereum as Parameters<typeof custom>[0]),
+  });
+
+  return createClient({
+    chain: STUDIONET,
+    // @ts-expect-error — GenLayer accepts viem walletClient as signer
+    account: viemWalletClient,
+  });
+}

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount, useWalletClient, useSwitchChain, useConnectorClient } from "wagmi";
+import { useAccount } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useConnect } from "wagmi";
-import { getWriteClient, CONTRACTS } from "@/lib/genlayer";
+import { getWindowWriteClient, CONTRACTS } from "@/lib/genlayer";
 import type { Hash } from "genlayer-js/types";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
@@ -29,8 +29,6 @@ const FIELD_LIMITS = {
 export default function PostTaskPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
-  const { data: walletClient } = useWalletClient();
-  const { switchChainAsync } = useSwitchChain();
   const { connect, isPending: isConnecting } = useConnect();
 
   const [form, setForm] = useState<FormData>({
@@ -51,20 +49,11 @@ export default function PostTaskPage() {
     Number(form.reward) > 0;
 
   async function handleSubmit() {
-    console.log("handleSubmit called", { isValid, walletClient: !!walletClient, address });
     if (!isValid || !address) { setError("Please fill all fields"); setState("error"); return; }
-    if (!walletClient) { setError("Wallet client not ready — try disconnecting and reconnecting your wallet"); setState("error"); return; }
     try {
       setState("submitting");
       setError(null);
-
-      // Switch to GenLayer Studionet if needed
-      try {
-        await switchChainAsync({ chainId: 61999 });
-      } catch {
-        // Chain may already be correct or switch not supported
-      }
-      const client = getWriteClient(walletClient);
+      const client = await getWindowWriteClient();
       const hash = await client.writeContract({
         address: CONTRACTS.work,
         functionName: "post_task",
