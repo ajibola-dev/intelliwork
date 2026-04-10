@@ -1,12 +1,8 @@
 {
   "name": "intelliwork",
   "private": true,
-  "version": "0.0.0",
   "scripts": {
-    "build": "npm install --prefix app && npm run build --prefix app",
+    "build": "npm install --prefix app --include=dev && npm run build --prefix app",
     "dev": "npm run dev --prefix app"
-  },
-  "dependencies": {
-    "next": "16.2.2"
   }
 }
