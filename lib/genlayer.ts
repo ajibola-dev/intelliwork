@@ -38,11 +38,12 @@ export async function getWindowWriteClient() {
     throw new Error("MetaMask not found");
   }
   const accounts = await win.ethereum.request({ method: "eth_requestAccounts" }) as string[];
-  if (!accounts || accounts.length === 0) throw new Error("No accounts found");
+  const account = Array.isArray(accounts) ? accounts[0] : (accounts as unknown as string);
+  if (!account) throw new Error("No accounts found");
   
-  const { createWalletClient, custom } = await import("viem");
+  const { createWalletClient, custom, toHex } = await import("viem");
   const viemWalletClient = createWalletClient({
-    account: accounts[0] as `0x${string}`,
+    account: account as `0x${string}`,
     transport: custom(win.ethereum as Parameters<typeof custom>[0]),
   });
 
