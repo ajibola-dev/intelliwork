@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient, useSwitchChain } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useConnect } from "wagmi";
 import { getWriteClient, CONTRACTS } from "@/lib/genlayer";
@@ -30,6 +30,7 @@ export default function PostTaskPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const { switchChainAsync } = useSwitchChain();
   const { connect, isPending: isConnecting } = useConnect();
 
   const [form, setForm] = useState<FormData>({
@@ -55,6 +56,12 @@ export default function PostTaskPage() {
       setState("submitting");
       setError(null);
 
+      // Switch to GenLayer Studionet if needed
+      try {
+        await switchChainAsync({ chainId: 61999 });
+      } catch {
+        // Chain may already be correct or switch not supported
+      }
       const client = getWriteClient(walletClient);
       const hash = await client.writeContract({
         address: CONTRACTS.work,

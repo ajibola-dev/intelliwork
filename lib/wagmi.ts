@@ -16,7 +16,11 @@ export const genLayerStudionet = {
 
 export const wagmiConfig = createConfig({
   chains: [genLayerStudionet],
-  connectors: [injected()],
+  connectors: [
+    injected({
+      target: "metaMask",
+    }),
+  ],
   transports: {
     [genLayerStudionet.id]: http("https://studio.genlayer.com/api"),
   },

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { useAccount, useWalletClient, useConnect } from "wagmi";
+import { useAccount, useWalletClient, useConnect, useSwitchChain } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { getReadClient, getWriteClient, CONTRACTS } from "@/lib/genlayer";
 import { useTask } from "@/lib/hooks/use-tasks";
@@ -61,8 +61,12 @@ function Field({
 
 async function sendTx(
   client: ReturnType<typeof getWriteClient>,
-  args: { address: `0x${string}`; functionName: string; args: unknown[] }
+  args: { address: `0x${string}`; functionName: string; args: unknown[] },
+  switchFn?: (args: { chainId: number }) => Promise<unknown>
 ) {
+  if (switchFn) {
+    try { await switchFn({ chainId: 61999 }); } catch { /* already on correct chain */ }
+  }
   const hash = await client.writeContract({
     ...args,
     value: BigInt(0),
@@ -80,6 +84,7 @@ export default function TaskDetailPage() {
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { connect } = useConnect();
+  const { switchChainAsync } = useSwitchChain();
 
   // Claim
   const [claimState, setClaimState] = useState<ActionState>("idle");
@@ -108,7 +113,7 @@ export default function TaskDetailPage() {
       setClaimState("submitting"); setActionError(null);
       const client = getWriteClient(walletClient);
       setClaimState("confirming");
-      await sendTx(client, { address: CONTRACTS.work, functionName: "claim_task", args: [id] });
+      await sendTx(client, { address: CONTRACTS.work, functionName: "claim_task", args: [id] }, switchChainAsync);
       setClaimState("success");
     } catch (e) {
       setActionError(e instanceof Error ? e.message : "Failed");
@@ -126,7 +131,7 @@ export default function TaskDetailPage() {
         address: CONTRACTS.work,
         functionName: "submit_work",
         args: [id, deliverableUrl.trim(), evidence.trim()],
-      });
+      }, switchChainAsync);
       setSubmitState("success");
     } catch (e) {
       setActionError(e instanceof Error ? e.message : "Failed");
@@ -144,7 +149,7 @@ export default function TaskDetailPage() {
         address: CONTRACTS.evaluation,
         functionName: "evaluate_submission",
         args: [id, task.title, task.requirements, deliverableUrl, evidence],
-      });
+      }, switchChainAsync);
       setEvalState("confirming");
       const readClient = getReadClient();
       const result = await readClient.readContract({
@@ -166,7 +171,7 @@ export default function TaskDetailPage() {
       setApproveState("submitting"); setActionError(null);
       const client = getWriteClient(walletClient);
       setApproveState("confirming");
-      await sendTx(client, { address: CONTRACTS.work, functionName: "approve_work", args: [id] });
+      await sendTx(client, { address: CONTRACTS.work, functionName: "approve_work", args: [id] }, switchChainAsync);
       setApproveState("success");
     } catch (e) {
       setActionError(e instanceof Error ? e.message : "Failed");
@@ -184,7 +189,7 @@ export default function TaskDetailPage() {
         address: CONTRACTS.work,
         functionName: "open_dispute",
         args: [id, disputeReason.trim()],
-      });
+      }, switchChainAsync);
       setDisputeState("success");
     } catch (e) {
       setActionError(e instanceof Error ? e.message : "Failed");
