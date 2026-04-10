@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount, useWalletClient, useSwitchChain } from "wagmi";
+import { useAccount, useWalletClient, useSwitchChain, useConnectorClient } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useConnect } from "wagmi";
 import { getWriteClient, CONTRACTS } from "@/lib/genlayer";
@@ -51,7 +51,9 @@ export default function PostTaskPage() {
     Number(form.reward) > 0;
 
   async function handleSubmit() {
-    if (!isValid || !walletClient || !address) return;
+    console.log("handleSubmit called", { isValid, walletClient: !!walletClient, address });
+    if (!isValid || !address) { setError("Please fill all fields"); setState("error"); return; }
+    if (!walletClient) { setError("Wallet client not ready — try disconnecting and reconnecting your wallet"); setState("error"); return; }
     try {
       setState("submitting");
       setError(null);
