@@ -41,9 +41,9 @@ export async function getWindowWriteClient() {
   const account = Array.isArray(accounts) ? accounts[0] : (accounts as unknown as string);
   if (!account) throw new Error("No accounts found");
   
-  const { createWalletClient, custom, toHex } = await import("viem");
+  const { createWalletClient, custom, getAddress } = await import("viem");
   const viemWalletClient = createWalletClient({
-    account: account as `0x${string}`,
+    account: getAddress(account),
     transport: custom(win.ethereum as Parameters<typeof custom>[0]),
   });
 
