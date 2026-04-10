@@ -1,8 +1,0 @@
-{
-  "name": "intelliwork",
-  "private": true,
-  "scripts": {
-    "build": "npm install --prefix app --include=dev && npm run build --prefix app",
-    "dev": "npm run dev --prefix app"
-  }
-}
