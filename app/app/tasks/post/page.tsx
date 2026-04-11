@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAccount } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useConnect } from "wagmi";
@@ -49,7 +49,9 @@ export default function PostTaskPage() {
     Number(form.reward) > 0;
 
   async function handleSubmit() {
+    if (isSubmittingRef.current) return;
     if (!isValid || !address) { setError("Please fill all fields"); setState("error"); return; }
+    isSubmittingRef.current = true;
     try {
       setState("submitting");
       setError(null);
@@ -75,10 +77,12 @@ export default function PostTaskPage() {
       });
 
       setState("success");
+      isSubmittingRef.current = false;
       setTimeout(() => router.push("/tasks"), 2500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Transaction failed");
       setState("error");
+      isSubmittingRef.current = false;
     }
   }
 
