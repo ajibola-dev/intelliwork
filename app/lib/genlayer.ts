@@ -33,21 +33,20 @@ export function getWriteClient(walletClient: { account: { address: `0x${string}`
  * wagmi SSR hydration issues with custom chains.
  */
 export async function getWindowWriteClient() {
-  const win = window as unknown as { ethereum?: { request: (a: { method: string; params?: unknown[] }) => Promise<unknown> } };
-  if (typeof window === "undefined" || !win.ethereum) {
-    throw new Error("MetaMask not found");
-  }
-  const rawAccounts = await win.ethereum.request({ method: "eth_requestAccounts" });
-  console.log("rawAccounts:", JSON.stringify(rawAccounts));
-  const accounts = rawAccounts as string[];
-  const account = Array.isArray(accounts) && accounts.length > 0 ? accounts[0] : typeof accounts === "string" ? accounts : null;
-  console.log("account:", account);
-  if (!account) throw new Error(`No accounts found. Raw: ${JSON.stringify(rawAccounts)}`);
-  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const eth = (window as any).ethereum;
+  if (!eth) throw new Error("MetaMask not found");
+
+  const accounts = await eth.request({ method: "eth_requestAccounts" }) as string[];
+  const account = accounts[0];
+  if (!account) throw new Error("No accounts found");
+
   const { createWalletClient, custom, getAddress } = await import("viem");
+  const checksummed = getAddress(account);
+  
   const viemWalletClient = createWalletClient({
-    account: getAddress(account),
-    transport: custom(win.ethereum as Parameters<typeof custom>[0]),
+    account: checksummed,
+    transport: custom(eth),
   });
 
   return createClient({
