@@ -45,6 +45,9 @@ export default function PostTaskPage() {
     try {
       setState("submitting");
       setError(null);
+      console.log("CONTRACTS.work:", CONTRACTS.work);
+      console.log("address:", address);
+      if (!CONTRACTS.work) { throw new Error("CONTRACTS.work is undefined - check env vars"); }
       const client = await getWindowWriteClient();
       const hash = await client.writeContract({
         address: CONTRACTS.work,
