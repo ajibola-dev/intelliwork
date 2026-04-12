@@ -36,14 +36,11 @@ export async function getWindowWriteClient() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const eth = (window as any).ethereum;
   if (!eth) throw new Error("MetaMask not found");
-
   const accounts = await eth.request({ method: "eth_requestAccounts" }) as string[];
-  const account = accounts[0];
+  const account = accounts[0] as `0x${string}`;
   if (!account) throw new Error("No accounts found");
-
-  // GenLayer docs: for MetaMask, pass just the address string to createClient()
-  return createClient({
-    chain: STUDIONET,
-    account: account as `0x${string}`,
-  });
+  // Per GenLayer docs: create client without account, pass account to writeContract
+  const client = createClient({ chain: STUDIONET });
+  // Return both client and account so the caller can pass account to writeContract
+  return { client, account };
 }
