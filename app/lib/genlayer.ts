@@ -41,18 +41,9 @@ export async function getWindowWriteClient() {
   const account = accounts[0];
   if (!account) throw new Error("No accounts found");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { createWalletClient, custom, getAddress } = await import("viem");
-  const checksummed = getAddress(account);
-
-  const viemWalletClient = createWalletClient({
-    account: { address: checksummed, type: "json-rpc" } as any,
-    transport: custom(eth),
-  });
-
+  // GenLayer docs: for MetaMask, pass just the address string to createClient()
   return createClient({
     chain: STUDIONET,
-    // @ts-expect-error — GenLayer accepts viem walletClient as signer
-    account: viemWalletClient,
+    account: account as `0x${string}`,
   });
 }
