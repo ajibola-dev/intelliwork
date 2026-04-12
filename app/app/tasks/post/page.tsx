@@ -56,10 +56,10 @@ export default function PostTaskPage() {
           title.trim(),
           description.trim(),
           requirements.trim(),
-          BigInt(Math.round(Number(reward))),
+          BigInt(Math.round(Number(reward) || 0)),
         ],
         value: BigInt(0),
-      } as Parameters<typeof client.writeContract>[0]);
+      });
 
       setTxHash(hash as unknown as string);
       setState("confirming");
