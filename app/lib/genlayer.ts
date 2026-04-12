@@ -41,11 +41,12 @@ export async function getWindowWriteClient() {
   const account = accounts[0];
   if (!account) throw new Error("No accounts found");
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { createWalletClient, custom, getAddress } = await import("viem");
   const checksummed = getAddress(account);
-  
+
   const viemWalletClient = createWalletClient({
-    account: checksummed,
+    account: { address: checksummed, type: "json-rpc" } as any,
     transport: custom(eth),
   });
 
