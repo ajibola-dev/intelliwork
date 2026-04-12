@@ -39,8 +39,12 @@ export async function getWindowWriteClient() {
   const accounts = await eth.request({ method: "eth_requestAccounts" }) as string[];
   const account = accounts[0] as `0x${string}`;
   if (!account) throw new Error("No accounts found");
-  // Per GenLayer docs: create client without account, pass account to writeContract
-  const client = createClient({ chain: STUDIONET });
-  // Return both client and account so the caller can pass account to writeContract
+  const client = createClient({
+    chain: STUDIONET,
+    account,
+    // @ts-expect-error — provider field supported per GenLayer docs
+    provider: eth,
+  });
+  await client.connect("studionet");
   return { client, account };
 }
