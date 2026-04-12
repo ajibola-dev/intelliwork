@@ -42,7 +42,6 @@ export async function getWindowWriteClient() {
   const client = createClient({
     chain: STUDIONET,
     account,
-    // @ts-expect-error — provider field supported per GenLayer docs
     provider: eth,
   });
   await client.connect("studionet");
