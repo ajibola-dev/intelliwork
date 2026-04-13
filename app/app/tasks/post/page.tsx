@@ -57,6 +57,7 @@ export default function PostTaskPage() {
           description.trim(),
           requirements.trim(),
           BigInt(String(Math.round(Number(reward) || 0))),
+          BigInt(1000),
         ],
         value: BigInt(0),
       });
