@@ -72,7 +72,11 @@ export default function PostTaskPage() {
       setState("success");
       setTimeout(() => router.push("/tasks"), 2500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Transaction failed");
+      console.error("Full error:", err);
+      console.error("Error type:", typeof err);
+      console.error("Error JSON:", JSON.stringify(err, null, 2));
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : JSON.stringify(err);
+      setError(msg || "Transaction failed");
       setState("error");
     }
   }
