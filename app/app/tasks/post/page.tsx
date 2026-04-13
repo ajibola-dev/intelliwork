@@ -56,7 +56,7 @@ export default function PostTaskPage() {
           title.trim(),
           description.trim(),
           requirements.trim(),
-          BigInt(Math.round(Number(reward) || 0)),
+          BigInt(String(Math.round(Number(reward) || 0))),
         ],
         value: BigInt(0),
       });

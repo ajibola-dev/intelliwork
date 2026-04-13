@@ -1,4 +1,5 @@
 import { createClient } from "genlayer-js";
+import { studionet } from "genlayer-js/chains";
 
 export const CONTRACTS = {
   work:       process.env.NEXT_PUBLIC_WORK_CONTRACT       as `0x${string}`,
@@ -16,7 +17,7 @@ export const STUDIONET = {
 } as const;
 
 export function getReadClient() {
-  return createClient({ chain: STUDIONET });
+  return createClient({ chain: studionet });
 }
 
 export function getWriteClient(walletClient: { account: { address: `0x${string}` } }) {
@@ -40,7 +41,7 @@ export async function getWindowWriteClient() {
   const account = accounts[0] as `0x${string}`;
   if (!account) throw new Error("No accounts found");
   const client = createClient({
-    chain: STUDIONET,
+    chain: studionet,
     account,
     provider: eth,
   });
