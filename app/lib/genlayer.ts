@@ -44,6 +44,7 @@ export async function getWindowWriteClient() {
     account,
     provider: eth,
   });
-  await client.connect("studionet");
+  // client.connect() calls wallet_getSnaps which only works in MetaMask
+  // Rabby and other wallets don't support it — network is added manually
   return client;
 }
