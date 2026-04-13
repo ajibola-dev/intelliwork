@@ -45,5 +45,5 @@ export async function getWindowWriteClient() {
     provider: eth,
   });
   await client.connect("studionet");
-  return { client, account };
+  return client;
 }
